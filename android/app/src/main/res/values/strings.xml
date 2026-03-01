@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">吉大课程表</string>
+    <string name="widget_description">显示今日课程安排和下节课提醒</string>
+    
+    <!-- 通知相关 -->
+    <string name="notification_channel_name">课程提醒</string>
+    <string name="notification_channel_description">上课前提醒和课程通知</string>
+    
+    <!-- 小组件相关 -->
+    <string name="widget_title">吉大课程表</string>
+    <string name="widget_no_courses">今天没有课程</string>
+    <string name="widget_next_course">下节课</string>
+    <string name="widget_today_courses">今日课程</string>
+    <string name="widget_loading">正在加载...</string>
+    
+    <!-- 设置相关 -->
+    <string name="reminder_settings">提醒设置</string>
+    <string name="widget_settings">小组件设置</string>
+    <string name="alarm_settings">闹钟设置</string>
+</resources>

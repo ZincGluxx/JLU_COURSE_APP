@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:provider/provider.dart';
 import 'dart:convert';
 import '../models/course.dart';
+import '../services/course_service.dart';
 
 /// WebView数据导入组件
 /// 
@@ -230,15 +232,13 @@ class _WebViewDataImporterState extends State<WebViewDataImporter> {
         final courses = _parseCourses(coursesData);
         
         if (courses.isNotEmpty) {
-          widget.onCoursesImported?.call(courses);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('✅ 成功导入 ${courses.length} 门课程'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
+          // 获取当前页面HTML来解析学期信息
+          final htmlContent = await _controller!.runJavaScriptReturningResult(
+            'document.body.innerHTML'
+          );
+          
+          // 显示学期保存选择对话框
+          _showSemesterSaveDialog(courses, htmlContent.toString());
         } else {
           _showErrorDialog('未能解析到课程数据');
         }
@@ -319,105 +319,6 @@ class _WebViewDataImporterState extends State<WebViewDataImporter> {
     }
     
     return weeks;
-  }
-
-  /// 从HTML提取成绩数据
-  Future<void> _extractGrades() async {
-    if (_controller == null || _isImporting) return;
-
-    setState(() {
-      _isImporting = true;
-    });
-
-    try {
-      final result = await _controller!.runJavaScriptReturningResult(
-        '''
-        (function() {
-          var grades = [];
-          
-          // 查找成绩表格
-          var rows = document.querySelectorAll('table tr, .grade-row');
-          
-          rows.forEach(function(row) {
-            var cells = row.querySelectorAll('td');
-            if (cells.length >= 4) {
-              var courseName = cells[0].innerText.trim();
-              var credit = cells[1].innerText.trim();
-              var score = cells[2].innerText.trim();
-              var gpa = cells[3].innerText.trim();
-              
-              if (courseName && score) {
-                grades.push({
-                  courseName: courseName,
-                  credit: credit,
-                  score: score,
-                  gpa: gpa
-                });
-              }
-            }
-          });
-          
-          return {
-            success: grades.length > 0,
-            grades: grades,
-            count: grades.length
-          };
-        })();
-        '''
-      );
-
-      final jsonResult = jsonDecode(result.toString());
-      
-      if (jsonResult['success'] == true) {
-        final gradesData = jsonResult['grades'] as List;
-        final grades = _parseGrades(gradesData);
-        
-        if (grades.isNotEmpty) {
-          widget.onGradesImported?.call(grades);
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('✅ 成功导入 ${grades.length} 门课程成绩'),
-                backgroundColor: Colors.green,
-              ),
-            );
-          }
-        }
-      } else {
-        _showErrorDialog('未找到成绩数据');
-      }
-    } catch (e) {
-      print('提取成绩失败: $e');
-      _showErrorDialog('成绩提取失败: $e');
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isImporting = false;
-        });
-      }
-    }
-  }
-
-  /// 解析成绩数据
-  List<Grade> _parseGrades(List gradesData) {
-    List<Grade> grades = [];
-    
-    for (var data in gradesData) {
-      try {
-        grades.add(Grade(
-          courseId: '', // HTML中可能没有courseId
-          courseName: data['courseName'],
-          credit: data['credit'] ?? '0',
-          score: data['score'],
-          gradePoint: data['gpa'] ?? '0',
-          semester: '', // HTML中可能需要从页面其他地方提取学期信息
-        ));
-      } catch (e) {
-        print('解析成绩失败: $e');
-      }
-    }
-    
-    return grades;
   }
 
   void _showErrorDialog(String message) {
@@ -540,18 +441,22 @@ class _WebViewDataImporterState extends State<WebViewDataImporter> {
         ),
         // 使用说明
         Container(
-          color: Colors.blue.shade50,
+          color: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.3),
           padding: const EdgeInsets.all(12),
           child: Row(
             children: [
-              Icon(Icons.info_outline, size: 20, color: Colors.blue.shade700),
+              Icon(
+                Icons.info_outline, 
+                size: 20, 
+                color: Theme.of(context).colorScheme.primary,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   '请在下方浏览器中登录教务系统，导航到课表页面，然后点击上方的导入按钮',
                   style: TextStyle(
                     fontSize: 12,
-                    color: Colors.blue.shade700,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -573,6 +478,199 @@ class _WebViewDataImporterState extends State<WebViewDataImporter> {
         ),
       ],
     );
+  }
+  
+  /// 显示学期保存选择对话框
+  void _showSemesterSaveDialog(List<Course> courses, String htmlContent) {
+    final courseService = Provider.of<CourseService>(context, listen: false);
+    
+    // 从HTML解析学期信息
+    final parsedSemester = courseService.parseSemesterFromHtml(htmlContent);
+    final currentSemester = courseService.currentSemester;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.save, color: Theme.of(context).primaryColor),
+            const SizedBox(width: 8),
+            const Text('保存课表'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '成功解析到 ${courses.length} 门课程',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (parsedSemester != null) ...[
+              Text('检测到学期：${_formatSemesterName(parsedSemester)}'),
+              const SizedBox(height: 8),
+            ],
+            if (parsedSemester != null && parsedSemester != currentSemester) ...[
+              const Text('请选择保存方式：'),
+              const SizedBox(height: 12),
+              Card(
+                color: Colors.green.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.1),
+                child: ListTile(
+                  leading: const Icon(Icons.add_circle, color: Colors.green),
+                  title: Text('保存为新学期'),
+                  subtitle: Text('${_formatSemesterName(parsedSemester)}'),
+                  onTap: () => _saveAsNewSemester(courses, parsedSemester, htmlContent),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            Card(
+              color: Colors.orange.withOpacity(Theme.of(context).brightness == Brightness.dark ? 0.3 : 0.1),
+              child: ListTile(
+                leading: const Icon(Icons.update, color: Colors.orange),
+                title: const Text('覆盖当前学期'),
+                subtitle: Text('${_formatSemesterName(currentSemester)}'),
+                onTap: () => _overwriteCurrentSemester(courses, htmlContent),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('取消'),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  /// 保存为新学期
+  Future<void> _saveAsNewSemester(List<Course> courses, String semester, String htmlContent) async {
+    Navigator.of(context).pop(); // 关闭对话框
+    
+    setState(() {
+      _isImporting = true;
+    });
+    
+    try {
+      final courseService = Provider.of<CourseService>(context, listen: false);
+      await courseService.importSemesterCourses(htmlContent, semester: semester, courses: courses);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ 成功导入新学期 ${_formatSemesterName(semester)}'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        
+        // 询问是否切换到新学期
+        _askSwitchToNewSemester(semester);
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorDialog('保存新学期失败: $e');
+      }
+    } finally {
+      setState(() {
+        _isImporting = false;
+      });
+    }
+  }
+  
+  /// 覆盖当前学期
+  Future<void> _overwriteCurrentSemester(List<Course> courses, String htmlContent) async {
+    Navigator.of(context).pop(); // 关闭对话框
+    
+    setState(() {
+      _isImporting = true;
+    });
+    
+    try {
+      // 直接调用原来的回调
+      widget.onCoursesImported?.call(courses);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ 成功更新当前学期课表（${courses.length} 门课程）'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        _showErrorDialog('更新当前学期失败: $e');
+      }
+    } finally {
+      setState(() {
+        _isImporting = false;
+      });
+    }
+  }
+  
+  /// 询问是否切换到新学期
+  void _askSwitchToNewSemester(String semester) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('切换学期'),
+        content: Text('是否切换到新导入的学期：${_formatSemesterName(semester)}？'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('暂不切换'),
+          ),
+          FilledButton(
+            onPressed: () async {
+              Navigator.of(context).pop();
+              try {
+                final courseService = Provider.of<CourseService>(context, listen: false);
+                await courseService.switchSemester(semester);
+                
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('✅ 已切换到 ${_formatSemesterName(semester)}'),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              } catch (e) {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('切换学期失败: $e'),
+                      backgroundColor: Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
+              }
+            },
+            child: const Text('立即切换'),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  /// 格式化学期名称显示
+  String _formatSemesterName(String semester) {
+    final parts = semester.split('-');
+    if (parts.length >= 3) {
+      return '${parts[0]}-${parts[1]}学年第${parts[2]}学期';
+    }
+    return semester;
   }
 
   @override

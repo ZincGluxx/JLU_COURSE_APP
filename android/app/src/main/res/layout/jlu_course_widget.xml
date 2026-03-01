@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_bg"
+    android:padding="12dp">
+
+    <!-- 标题栏 -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="8dp">
+        
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@mipmap/ic_launcher"
+            android:layout_marginEnd="8dp" />
+        
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+            
+            <TextView
+                android:id="@+id/tv_date_weekday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3月2日 周日"
+                android:textSize="14sp"
+                android:textColor="#1565C0"
+                android:textStyle="bold" />
+                
+            <TextView
+                android:id="@+id/tv_week_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="第1周"
+                android:textSize="12sp"
+                android:textColor="#757575" />
+        </LinearLayout>
+        
+        <TextView
+            android:id="@+id/tv_course_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="3节课"
+            android:textSize="12sp"
+            android:textColor="#1565C0"
+            android:background="@drawable/course_count_bg"
+            android:padding="4dp" />
+    </LinearLayout>
+
+    <!-- 下节课信息 -->
+    <LinearLayout
+        android:id="@+id/layout_next_course"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/next_course_bg"
+        android:padding="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="visible">
+        
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="⏰ 下节课"
+                android:textSize="12sp"
+                android:textColor="#FF6B6B"
+                android:textStyle="bold" />
+                
+            <TextView
+                android:id="@+id/tv_countdown"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="30分钟后"
+                android:textSize="12sp"
+                android:textColor="#FF6B6B"
+                android:gravity="end" />
+        </LinearLayout>
+        
+        <TextView
+            android:id="@+id/tv_next_course_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="高等数学A1"
+            android:textSize="14sp"
+            android:textColor="#333333"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp" />
+            
+        <TextView
+            android:id="@+id/tv_next_course_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📍 前卫-东荣大厦A330 • 10:00-11:40"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <!-- 今日课程列表 -->
+    <LinearLayout
+        android:id="@+id/layout_today_courses"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+        
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📚 今日课程"
+            android:textSize="12sp"
+            android:textColor="#1565C0"
+            android:textStyle="bold"
+            android:layout_marginBottom="4dp" />
+        
+        <!-- 课程项目 -->
+        <LinearLayout
+            android:id="@+id/course_item_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:padding="4dp"
+            android:background="@drawable/course_item_bg"
+            android:layout_marginBottom="2dp">
+            
+            <View
+                android:layout_width="3dp"
+                android:layout_height="match_parent"
+                android:background="#4ECDC4"
+                android:layout_marginEnd="8dp" />
+                
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+                
+                <TextView
+                    android:id="@+id/tv_course_name_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="线性代数"
+                    android:textSize="13sp"
+                    android:textColor="#333333"
+                    android:textStyle="bold" />
+                    
+                <TextView
+                    android:id="@+id/tv_course_info_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="东荣A330 • 8:00-9:40"
+                    android:textSize="11sp"
+                    android:textColor="#666666" />
+            </LinearLayout>
+        </LinearLayout>
+        
+        <!-- 更多课程项目可以动态生成 -->
+    </LinearLayout>
+
+    <!-- 无课程提示 -->
+    <LinearLayout
+        android:id="@+id/layout_no_courses"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone">
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🎉"
+            android:textSize="32sp" />
+            
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="今天没有课程"
+            android:textSize="14sp"
+            android:textColor="#999999"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+
+</LinearLayout>

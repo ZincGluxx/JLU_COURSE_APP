@@ -3,8 +3,9 @@ import '../models/course.dart';
 
 class CourseCard extends StatelessWidget {
   final Course course;
+  final Color courseColor;
 
-  const CourseCard({super.key, required this.course});
+  const CourseCard({super.key, required this.course, required this.courseColor});
 
   @override
   Widget build(BuildContext context) {
@@ -17,76 +18,80 @@ class CourseCard extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(12),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 children: [
                   Container(
                     width: 4,
-                    height: 48,
+                    height: 40,
                     decoration: BoxDecoration(
-                      color: _getCourseColor(course.id),
+                      color: courseColor,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           course.name,
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Text(
                           course.teacher,
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 13,
                             color: Colors.grey[600],
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  Icon(Icons.access_time, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
-                  Text(
-                    course.getTimeRange(),
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                  ),
-                  const SizedBox(width: 16),
-                  Icon(Icons.class_, size: 16, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
-                  Text(
-                    '第${course.startSection}-${course.endSection}节',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                  ),
-                ],
-              ),
               const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
+                  Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
                   const SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      course.location,
-                      style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-                    ),
+                  Text(
+                    '${course.getTimeRange()} 第${course.startSection}-${course.endSection}节',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ],
               ),
+              if (course.location.isNotEmpty) const SizedBox(height: 4),
+              if (course.location.isNotEmpty)
+                Row(
+                  children: [
+                    Icon(Icons.location_on, size: 14, color: Colors.grey[600]),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        course.location,
+                        style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
             ],
           ),
         ),
@@ -179,19 +184,7 @@ class CourseCard extends StatelessWidget {
     return '第${weeks.first}-${weeks.last}周';
   }
 
-  Color _getCourseColor(String courseId) {
-    final colors = [
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.red,
-      Colors.teal,
-      Colors.indigo,
-      Colors.pink,
-    ];
-    return colors[courseId.hashCode % colors.length];
-  }
+  // 颜色分配逻辑已统一到course_table_screen.dart
 }
 
 class _DetailRow extends StatelessWidget {

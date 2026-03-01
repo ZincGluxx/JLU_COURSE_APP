@@ -22,8 +22,8 @@ class JluApiService {
   }
 
   final http.Client _client = _createHttpClient();
-  String? _cookie;
   // Token storage handled via cookies and session management
+  String? _cookie;
   bool _isLoggedIn = false;
 
   /// 检查是否已登录
