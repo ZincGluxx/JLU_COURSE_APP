@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- 信任系统证书 -->
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors>
+            <certificates src="system" />
+            <!-- 信任用户安装的证书（调试用） -->
+            <certificates src="user" />
+        </trust-anchors>
+    </base-config>
+    
+    <!-- 为JLU域名配置特殊规则 -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">jlu.edu.cn</domain>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

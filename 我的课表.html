@@ -1,0 +1,92 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    
+    
+<script>
+    window._JW_INIT_CONFIG = {"platformDomainName":null,"exportZipMaXFileNum":"10","appId":"4770397878132218","runningDbEnvironment":"oracle","indexLogoUrl":"https://iedu.jlu.edu.cn/jwapp/sys/emaphome/logo.do","userid":"19231110","ROLEID":"ef212c48c8f84be79acbd9d81b090f51","jwAppTheme":"blue","jwAppFooterText":"","ROOT_PATH":"/jwapp","basePath":"/jwapp/sys/jwpubapp","username":"辛洪宇","emapdatatableDefaultPageSize":"20","resResourcePath":"//iedu.jlu.edu.cn","emapdatatableDefaultHeight":"normal","emapdatatableIsOnceEmpty":"false","appname":"wdkb","path":"/jwapp","contextPath":"/jwapp","APP_VERSION":1767492364226,"firstDayOfWeek":"1","DEBUG":false,"_v":1767492364226};
+</script>
+<script src="//iedu.jlu.edu.cn/fe_components/commonlib.js?av=1767492364226"></script>
+<script src="/jwapp/sys/jwpubapp/boot/js/boot_before.js?av=1767492364226"></script>
+<script src="//iedu.jlu.edu.cn/bower_components/bootstrap/dist/js/bootstrap.min.js?av=1767492364226"></script>
+<script src="//iedu.jlu.edu.cn/bower_components/summernote-0.8.1/dist/summernote.js?av=1767492364226"></script>
+<script src="//iedu.jlu.edu.cn/bower_components/cropper/cropper.min.js?av=1767492364226"></script>
+<script src="//iedu.jlu.edu.cn/fe_components/appcore-min.js?av=1767492364226"></script>
+<script src="/jwapp/sys/jwpubapp/boot/js/boot.js?av=1767492364226"></script>
+
+    <link rel="stylesheet" type="text/css" href="../public/widget/weekUnitTableInfo/weekUnitTableInfo.css?av=1767492364226" />
+    <script src="../public/js/ggFunctions.js?av=1767492364226"></script>
+	<script src="../public/js/jwpublic.js?av=1767492364226"></script>
+	<script src="../public/js/printArea.js?av=1767492364226"></script>
+    <script src="../public/widget/weekUnitTableInfo/weekUnitTableInfo.js?av=1767492364226"></script>
+    <script type="text/javascript" src="../../jwpubapp/public/script/publicFunction.js?av=1767492364226"></script>
+    <script type="text/javascript" src="../../jwpubapp/public/script/radialIndicator.js?av=1767492364226"></script>
+    <script type="text/javascript" src="../../jwpubapp/public/script/publicPrintFR.js?av=1767492364226"></script>
+    <script type="text/javascript">
+		function includeJsAndCssFiles(file) {
+			var includePath = '';
+			if (window.WIS_CONFIG !== undefined && window.WIS_CONFIG.PATH !== undefined) {
+				includePath += window.WIS_CONFIG.PATH;
+			}
+			includePath += '';
+
+			var files = typeof file == "string" ? [ file ] : file;
+			for (var i = 0; i < files.length; i++) {
+				var name = files[i];
+				var att = name.split('.');
+				var ext = att[att.length - 1].toLowerCase();
+				var isCSS = ext == "css";
+				var tag = isCSS ? "link" : "script";
+				var attr = isCSS ? " type='text/css' rel='stylesheet' " : " language='javascript' type='text/javascript' ";
+				var link = (isCSS ? "href" : "src") + "='" + name + "'";
+				if ($(tag + "[" + link + "]").length == 0) {
+					document.write("<" + tag + attr + link + "></" + tag + ">");
+				}
+			}
+		}
+		//var isIe = /msie/.test(navigator.userAgent.toLowerCase());
+		function isIE() { //ie?  
+		    if (!!window.ActiveXObject || "ActiveXObject" in window)  
+		        return true;  
+		    else  
+		        return false;  
+		}  
+		if (isIE()) {
+			includeJsAndCssFiles('../public/widget/weekUnitTableInfo/es6-promise.js');
+		}
+	</script>
+    <script src="../public/widget/weekUnitTableInfo/html2canvas.js?av=1767492364226"></script>
+    <!-- package.js 转测时开放（执行gulp buildapp 命令可以生成该文件）-->
+    <!-- <script type="text/javascript" src="./dest/package.js"></script> -->
+    <!-- 全局变量pageMeta-->
+    <script type="text/javascript">
+        var pageMeta = {"datas":{},"models":[],"routes":{},"params":{"ROLEID":"ef212c48c8f84be79acbd9d81b090f51","USERID":"19231110"}};
+		var userId = pageMeta.params.USERID;
+		var userName = pageMeta.params.USERNAME;
+        var roleId = pageMeta.params.ROLEID==''?"ef212c48c8f84be79acbd9d81b090f51":pageMeta.params.ROLEID;
+		pageMeta.params.ROLEID = roleId;
+		var dqrq = pageMeta.params.DQSJ;  
+		window.WIS_CONFIG = {
+			ROOT_PATH: "/jwapp",
+			PATH: "/jwapp",
+			APPID: "4770397878132218",
+			APPNAME:"wdkb",
+			DBENVIRONMENT:"oracle"
+		}
+
+
+		
+    </script>
+</head>
+
+<body>
+</body>
+
+</html>
