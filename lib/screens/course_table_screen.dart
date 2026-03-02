@@ -107,10 +107,6 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
         }
 
         if (courseService.error != null) {
-          // 检查是否是401认证错误
-          final is401Error = courseService.error!.contains('401') || 
-                             courseService.error!.contains('Unauthorized');
-          
           return Scaffold(
             body: Center(
               child: Padding(
@@ -118,18 +114,11 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      is401Error ? Icons.lock_outline : Icons.error_outline,
-                      size: 64,
-                      color: is401Error ? Colors.orange : Colors.red,
-                    ),
+                    const Icon(Icons.error_outline, size: 64, color: Colors.red),
                     const SizedBox(height: 24),
-                    Text(
-                      is401Error ? '登录已过期' : '加载失败',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    const Text(
+                      '加载失败',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
                     Text(
@@ -137,47 +126,11 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                       textAlign: TextAlign.center,
                       style: const TextStyle(color: Colors.grey),
                     ),
-                    if (is401Error) ...[
-                      const SizedBox(height: 8),
-                      const Text(
-                        'Cookie已失效，请重新登录获取最新数据',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.orange,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ],
                     const SizedBox(height: 32),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        if (!is401Error) ...[
-                          ElevatedButton.icon(
-                            onPressed: () => courseService.fetchCourses(),
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('重试'),
-                          ),
-                          const SizedBox(width: 16),
-                        ],
-                        OutlinedButton.icon(
-                          onPressed: () async {
-                            // 清除登录信息
-                            await courseService.logout();
-                            if (context.mounted) {
-                              // 跳转到设置页面
-                              Navigator.popUntil(context, (route) => route.isFirst);
-                              // 导航到设置标签（假设是第3个标签）
-                              DefaultTabController.of(context).animateTo(2);
-                            }
-                          },
-                          icon: const Icon(Icons.login),
-                          label: Text(is401Error ? '重新登录' : '去登录'),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: is401Error ? Colors.orange : null,
-                          ),
-                        ),
-                      ],
+                    ElevatedButton.icon(
+                      onPressed: () => courseService.fetchCourses(),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('重试'),
                     ),
                   ],
                 ),

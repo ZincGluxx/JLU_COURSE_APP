@@ -14,9 +14,6 @@ import '../services/course_service.dart';
 /// - 快速查看本周课程
 class WidgetService {
   static const String _widgetName = 'JLUCourseWidget';
-  static const String _todayCoursesKey = 'todayCourses';
-  static const String _nextCourseKey = 'nextCourse';
-  static const String _currentWeekKey = 'currentWeek';
   
   /// 初始化桌面小组件
   static Future<bool> initialize() async {

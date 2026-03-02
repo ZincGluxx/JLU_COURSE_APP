@@ -312,7 +312,7 @@ class _SimpleWebViewLoginState extends State<SimpleWebViewLogin> {
           return;
         }
         
-        final courses = _parseCourses(coursesList as List);
+        final courses = _parseCourses(coursesList);
         
         if (courses.isNotEmpty) {
           widget.onCoursesExtracted(courses);

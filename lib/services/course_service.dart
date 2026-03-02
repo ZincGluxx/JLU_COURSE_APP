@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/course.dart';
-import 'jlu_api_service.dart';
 
 class CourseService extends ChangeNotifier {
   List<Course> _courses = [];
@@ -21,10 +20,6 @@ class CourseService extends ChangeNotifier {
   DateTime? get semesterStartDate => _semesterStartDate;
   String get currentSemester => _currentSemester;
   List<String> get availableSemesters => _availableSemesters;
-  
-  bool get isLoggedIn => _apiService.isLoggedIn;
-
-  final JluApiService _apiService = JluApiService();
   
   CourseService() {
     // 初始化时加载缓存数据和设置
@@ -108,11 +103,6 @@ class CourseService extends ChangeNotifier {
     return DateTime.now().weekday;
   }
   
-  Future<void> _initLogin() async {
-    await _apiService.restoreLoginFromCache();
-    notifyListeners();
-  }
-
   // 获取课程表（仅从缓存加载）
   Future<void> fetchCourses() async {
     // 应用启动时从缓存加载课程数据
@@ -200,9 +190,8 @@ class CourseService extends ChangeNotifier {
     notifyListeners();
   }
   
-  // 退出登录
+  // 清除本地数据
   Future<void> logout() async {
-    await _apiService.logout();
     _courses = [];
     _currentWeek = 1;
     _error = null;

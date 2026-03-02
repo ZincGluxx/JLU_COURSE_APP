@@ -3,15 +3,13 @@ import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
 import 'screens/course_edit_screen.dart';
 import 'services/course_service.dart';
-import 'services/notification_service.dart';
 import 'services/widget_service.dart';
 import 'widgets/webview_data_importer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 初始化各种服务
-  await NotificationService.initialize();
+  // 初始化桌面小组件服务
   await WidgetService.initialize();
   
   runApp(const MyApp());
