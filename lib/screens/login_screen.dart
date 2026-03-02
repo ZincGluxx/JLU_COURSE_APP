@@ -5,13 +5,18 @@ import '../services/course_service.dart';
 import '../models/course.dart';
 
 class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+  final bool isVpnMode;
+  
+  const LoginScreen({super.key, this.isVpnMode = false});
 
   @override
   Widget build(BuildContext context) {
+    final loginTitle = isVpnMode ? 'VPN登录获取课表' : '导入课表';
+    final loginUrl = isVpnMode ? 'vpn.jlu.edu.cn' : 'i.jlu.edu.cn';
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('导入课表'),
+        title: Text(loginTitle),
       ),
       body: Center(
         child: Padding(
@@ -20,22 +25,26 @@ class LoginScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(
-                Icons.school,
+                isVpnMode ? Icons.vpn_key : Icons.school,
                 size: 80,
                 color: Theme.of(context).colorScheme.primary,
               ),
               const SizedBox(height: 24),
-              const Text(
-                '欢迎使用\n吉林大学课程表',
+              Text(
+                isVpnMode
+                    ? '通过校园VPN\n获取课程表'
+                    : '欢迎使用\n吉林大学课程表',
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 16),
               Text(
-                '简单三步获取您的课表',
+                isVpnMode
+                    ? '使用VPN方式登录教务系统'
+                    : '简单三步获取您的课表',
                 style: TextStyle(
                   fontSize: 16,
                   color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -52,6 +61,7 @@ class LoginScreen extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (_) => SimpleWebViewLogin(
+                        isVpnMode: isVpnMode,
                         onCoursesExtracted: (c) => Navigator.pop(context, c),
                       ),
                     ),
@@ -71,8 +81,8 @@ class LoginScreen extends StatelessWidget {
                     }
                   }
                 },
-                icon: const Icon(Icons.login),
-                label: const Text('登录并获取课表'),
+                icon: Icon(isVpnMode ? Icons.vpn_key : Icons.login),
+                label: Text(isVpnMode ? 'VPN登录并获取课表' : '登录并获取课表'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
@@ -112,9 +122,14 @@ class LoginScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      '1️⃣ 登录 i.jlu.edu.cn\n'
-                      '2️⃣ 找到并打开"我的课表"\n'
-                      '3️⃣ 点击右上角下载按钮',
+                      isVpnMode
+                          ? '1️⃣ 登录 $loginUrl\n'
+                            '2️⃣ 通过VPN访问内网教务系统\n'
+                            '3️⃣ 找到并打开"我的课表"\n'
+                            '4️⃣ 点击右上角下载按钮'
+                          : '1️⃣ 登录 $loginUrl\n'
+                            '2️⃣ 找到并打开"我的课表"\n'
+                            '3️⃣ 点击右上角下载按钮',
                       style: TextStyle(
                         fontSize: 13,
                         color: Theme.of(context)

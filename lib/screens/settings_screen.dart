@@ -61,27 +61,8 @@ class SettingsScreen extends StatelessWidget {
           ),
           const Divider(),
           const _SectionHeader(title: '数据管理'),
-          // 导入新学期课表
-          ListTile(
-            leading: const Icon(Icons.download_rounded, color: Colors.teal),
-            title: const Text('导入课表'),
-            subtitle: const Text('登录教务系统并导入课程数据'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const LoginScreen(),
-                ),
-              );
-
-              if (result == true && context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('✅ 课表已更新')),
-                );
-              }
-            },
-          ),
+          // 导入新学期课表 - 展开样式
+          const _ImportCoursesSection(),
 
           // 清除所有数据
           ListTile(
@@ -249,7 +230,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           ListTile(
             title: const Text('版本'),
-            subtitle: const Text('1.0.0'),
+            subtitle: const Text('1.1.0'),
           ),
           ListTile(
             leading: const Icon(Icons.person_outline),
@@ -358,6 +339,77 @@ class SettingsScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ImportCoursesSection extends StatefulWidget {
+  const _ImportCoursesSection();
+
+  @override
+  State<_ImportCoursesSection> createState() => _ImportCoursesSectionState();
+}
+
+class _ImportCoursesSectionState extends State<_ImportCoursesSection> {
+  bool _isExpanded = false;
+
+  Future<void> _handleLogin(BuildContext context, {required bool isVpn}) async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LoginScreen(isVpnMode: isVpn),
+      ),
+    );
+
+    if (result == true && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('✅ 课表已更新')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ListTile(
+          leading: const Icon(Icons.download_rounded, color: Colors.teal),
+          title: const Text('导入课表'),
+          subtitle: const Text('选择登录方式并导入课程数据'),
+          trailing: Icon(
+            _isExpanded ? Icons.expand_less : Icons.expand_more,
+            size: 20,
+          ),
+          onTap: () {
+            setState(() {
+              _isExpanded = !_isExpanded;
+            });
+          },
+        ),
+        if (_isExpanded) ...[
+          Padding(
+            padding: const EdgeInsets.only(left: 56, right: 16),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.web, color: Colors.blue),
+                  title: const Text('普通登录'),
+                  subtitle: const Text('通过 i.jlu.edu.cn 登录'),
+                  onTap: () => _handleLogin(context, isVpn: false),
+                  dense: true,
+                ),
+                ListTile(
+                  leading: const Icon(Icons.vpn_key, color: Colors.orange),
+                  title: const Text('VPN登录'),
+                  subtitle: const Text('通过 vpn.jlu.edu.cn 登录'),
+                  onTap: () => _handleLogin(context, isVpn: true),
+                  dense: true,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

@@ -4,13 +4,15 @@ import 'package:webview_flutter/webview_flutter.dart';
 import '../models/course.dart';
 
 /// 简单的WebView登录和课表提取组件
-/// 专门适配吉林大学教务系统 (i.jlu.edu.cn)
+/// 专门适配吉林大学教务系统 (i.jlu.edu.cn) 和校园VPN (vpn.jlu.edu.cn)
 class SimpleWebViewLogin extends StatefulWidget {
   final Function(List<Course> courses) onCoursesExtracted;
+  final bool isVpnMode;
 
   const SimpleWebViewLogin({
     super.key,
     required this.onCoursesExtracted,
+    this.isVpnMode = false,
   });
 
   @override
@@ -25,12 +27,15 @@ class _SimpleWebViewLoginState extends State<SimpleWebViewLogin> {
 
   @override
   Widget build(BuildContext context) {
+    final loginTitle = widget.isVpnMode ? 'VPN登录并获取课表' : '登录并获取课表';
+    final loginUrl = widget.isVpnMode ? 'vpn.jlu.edu.cn' : 'i.jlu.edu.cn';
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('登录并获取课表'),
+        title: Text(loginTitle),
         actions: [
-          // 提取按钮
-          if (_currentUrl.contains('i.jlu.edu.cn') || _currentUrl.contains('iedu.jlu.edu.cn'))
+          // 提取按钮 - 根据模式检测不同的URL
+          if (_shouldShowExtractButton())
             IconButton(
               icon: _isExtracting
                   ? const SizedBox(
@@ -51,7 +56,7 @@ class _SimpleWebViewLoginState extends State<SimpleWebViewLogin> {
             LinearProgressIndicator(value: _loadingProgress),
           // 使用说明
           Container(
-            color: Colors.blue[50],
+            color: widget.isVpnMode ? Colors.orange[50] : Colors.blue[50],
             padding: const EdgeInsets.all(12),
             width: double.infinity,
             child: Column(
@@ -59,23 +64,35 @@ class _SimpleWebViewLoginState extends State<SimpleWebViewLogin> {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.info_outline, size: 18, color: Colors.blue[700]),
+                    Icon(
+                      Icons.info_outline, 
+                      size: 18, 
+                      color: widget.isVpnMode ? Colors.orange[700] : Colors.blue[700]
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       '使用指南',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: Colors.blue[700],
+                        color: widget.isVpnMode ? Colors.orange[700] : Colors.blue[700],
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  '1️⃣ 在下方网页中登录 i.jlu.edu.cn\n'
-                  '2️⃣ 登录后会自动跳转到课表页面\n'
-                  '3️⃣ 看到课表后，点击右上角下载图标',
-                  style: TextStyle(fontSize: 13, color: Colors.blue[700]),
+                  widget.isVpnMode
+                      ? '1️⃣ 在下方网页中登录 $loginUrl\n'
+                        '2️⃣ 通过VPN访问内网教务系统\n'  
+                        '3️⃣ 找到"我的课表"页面\n'
+                        '4️⃣ 看到课表后，点击右上角下载图标'
+                      : '1️⃣ 在下方网页中登录 $loginUrl\n'
+                        '2️⃣ 登录后会自动跳转到课表页面\n'
+                        '3️⃣ 看到课表后，点击右上角下载图标',
+                  style: TextStyle(
+                    fontSize: 13, 
+                    color: widget.isVpnMode ? Colors.orange[700] : Colors.blue[700]
+                  ),
                 ),
               ],
             ),
@@ -89,8 +106,25 @@ class _SimpleWebViewLoginState extends State<SimpleWebViewLogin> {
     );
   }
 
+  bool _shouldShowExtractButton() {
+    if (widget.isVpnMode) {
+      // VPN模式下检测更多可能的URL
+      return _currentUrl.contains('jlu.edu.cn') || 
+             _currentUrl.contains('vpn.jlu.edu.cn') ||
+             _currentUrl.contains('iedu.jlu.edu.cn');
+    } else {
+      // 普通模式下检测原有的URL
+      return _currentUrl.contains('i.jlu.edu.cn') || 
+             _currentUrl.contains('iedu.jlu.edu.cn');
+    }
+  }
+
   WebViewController _getController() {
     if (_controller != null) return _controller!;
+
+    final initialUrl = widget.isVpnMode 
+        ? 'https://vpn.jlu.edu.cn' 
+        : 'https://i.jlu.edu.cn';
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
@@ -116,7 +150,7 @@ class _SimpleWebViewLoginState extends State<SimpleWebViewLogin> {
           },
         ),
       )
-      ..loadRequest(Uri.parse('https://i.jlu.edu.cn'));
+      ..loadRequest(Uri.parse(initialUrl));
 
     return _controller!;
   }
