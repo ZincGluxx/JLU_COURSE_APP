@@ -22,8 +22,12 @@ dependencies:
   webview_flutter: ^4.7.0
   webview_flutter_web: ^0.2.2
   cookie_jar: ^4.0.8
+  # 闹钟提醒功能
+  android_alarm_manager_plus: ^4.0.3
   # 桌面小组件
   home_widget: ^0.6.0
+  # 权限管理
+  permission_handler: ^11.3.1
 
 dev_dependencies:
   flutter_test:

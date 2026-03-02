@@ -411,7 +411,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
     final availableWidth = screenWidth - padding;
     final sectionColumnWidth = availableWidth * 0.10;
     final dayColumnWidth = (availableWidth - sectionColumnWidth) / 7;
-    const cellHeight = 44.0;
+    const cellHeight = 56.0;
     
     return {
       'padding': padding,
@@ -706,13 +706,13 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
         padding: isWeekView ? const EdgeInsets.all(2) : const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: isInactive
-              ? baseColor.withOpacity(0.18)
-              : baseColor.withOpacity(0.55),
+              ? baseColor.withOpacity(0.25)
+              : baseColor,
           borderRadius: BorderRadius.circular(4),
           border: Border.all(
             color: isInactive
-                ? baseColor.withOpacity(0.3)
-                : baseColor.withOpacity(0.6),
+                ? baseColor.withOpacity(0.4)
+                : baseColor.withOpacity(0.8),
             width: 1,
           ),
         ),
@@ -726,9 +726,9 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                 fontWeight: FontWeight.bold,
                 fontSize: isSmallScreen ? 10 : 11,
                 color: isInactive
-                    ? baseColor.withOpacity(0.5)
-                    : (isWeekView ? Colors.black87 : Colors.white),
-                shadows: (isInactive || isWeekView) ? null : [
+                    ? Colors.white.withOpacity(0.6)
+                    : Colors.white,
+                shadows: isInactive ? null : [
                   Shadow(
                     color: Colors.black.withOpacity(0.3),
                     offset: const Offset(0, 1),
@@ -745,9 +745,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                 _shortenLocation(course.location),
                 style: TextStyle(
                   fontSize: 9,
-                  color: isInactive
-                      ? baseColor.withOpacity(0.4)
-                      : (isWeekView ? Colors.black54 : Colors.white.withOpacity(0.9)),
+                  color: Colors.white.withOpacity(isInactive ? 0.5 : 0.9),
                 ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
