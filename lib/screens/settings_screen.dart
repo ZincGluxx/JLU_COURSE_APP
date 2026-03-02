@@ -133,6 +133,115 @@ class SettingsScreen extends StatelessWidget {
             },
           ),
           const Divider(),
+          const _SectionHeader(title: '学期管理'),
+          Consumer<CourseService>(
+            builder: (context, courseService, child) {
+              final semesters = courseService.availableSemesters;
+              if (semesters.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                  child: Text(
+                    '暂无已保存的课表，请先导入课表。',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                );
+              }
+              String fmt(String s) {
+                final p = s.split('-');
+                return p.length >= 3 ? '${p[0]}-${p[1]}学年第${p[2]}学期' : s;
+              }
+
+              return Column(
+                children: semesters.map((s) {
+                  final isCurrent = s == courseService.currentSemester;
+                  return ListTile(
+                    leading: Icon(
+                      isCurrent ? Icons.event_available : Icons.event_note,
+                      color: isCurrent
+                          ? Theme.of(context).colorScheme.primary
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                    title: Text(
+                      fmt(s),
+                      style: isCurrent
+                          ? TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.primary,
+                            )
+                          : null,
+                    ),
+                    subtitle: isCurrent ? const Text('当前学期') : null,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (!isCurrent)
+                          TextButton(
+                            onPressed: () async {
+                              await courseService.switchSemester(s);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('已切换到 ${fmt(s)}')),
+                                );
+                              }
+                            },
+                            child: const Text('切换'),
+                          ),
+                        IconButton(
+                          icon: Icon(
+                            Icons.delete_outline,
+                            color: isCurrent ? Colors.grey : Colors.red,
+                          ),
+                          tooltip: isCurrent ? '无法删除当前学期' : '删除该学期课表',
+                          onPressed: isCurrent
+                              ? null
+                              : () async {
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: const Row(
+                                        children: [
+                                          Icon(Icons.warning, color: Colors.orange),
+                                          SizedBox(width: 8),
+                                          Text('删除课表'),
+                                        ],
+                                      ),
+                                      content: Text(
+                                          '确定删除「${fmt(s)}」的课表？\n此操作不可恢复。'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(ctx, false),
+                                          child: const Text('取消'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(ctx, true),
+                                          style: TextButton.styleFrom(
+                                              foregroundColor: Colors.red),
+                                          child: const Text('删除'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  if (confirm == true && context.mounted) {
+                                    await courseService.deleteSemester(s);
+                                    if (context.mounted) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text('已删除 ${fmt(s)}')),
+                                      );
+                                    }
+                                  }
+                                },
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              );
+            },
+          ),
+          const Divider(),
           const _SectionHeader(title: '关于'),
           ListTile(
             title: const Text('应用名称'),

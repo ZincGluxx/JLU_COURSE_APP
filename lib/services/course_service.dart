@@ -416,6 +416,30 @@ class CourseService extends ChangeNotifier {
     }
   }
   
+  // 保存课程到指定学期（非破坏性 — 不切换当前学期）
+  Future<void> saveCoursesForSemester(String semester, List<Course> courses) async {
+    final merged = _mergeContinuousCourses(courses);
+    _semesterCourses[semester] = merged;
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final coursesJson = merged.map((c) => c.toJson()).toList();
+      await prefs.setString('courses_$semester', jsonEncode(coursesJson));
+
+      if (!_availableSemesters.contains(semester)) {
+        _availableSemesters.add(semester);
+        await prefs.setString('available_semesters', jsonEncode(_availableSemesters));
+      }
+
+      print('✅ 已保存学期 $semester 的 ${merged.length} 门课程');
+    } catch (e) {
+      print('❌ 保存学期课程失败: $e');
+      rethrow;
+    }
+
+    notifyListeners();
+  }
+
   // 删除学期数据
   Future<void> deleteSemester(String semester) async {
     if (semester == _currentSemester) {
