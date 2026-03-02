@@ -252,6 +252,53 @@ class SettingsScreen extends StatelessWidget {
             subtitle: const Text('1.0.0'),
           ),
           ListTile(
+            leading: const Icon(Icons.person_outline),
+            title: const Text('作者'),
+            subtitle: const Text('ZincGlux'),
+          ),
+          ListTile(
+            leading: const Icon(Icons.balance),
+            title: const Text('开源协议'),
+            subtitle: const Text('GNU General Public License v3.0'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Row(
+                    children: [
+                      Icon(Icons.balance),
+                      SizedBox(width: 8),
+                      Text('GPL v3'),
+                    ],
+                  ),
+                  content: const SingleChildScrollView(
+                    child: Text(
+                      'Copyright (C) 2026  ZincGlux\n\n'
+                      'This program is free software: you can redistribute it and/or modify '
+                      'it under the terms of the GNU General Public License as published by '
+                      'the Free Software Foundation, either version 3 of the License, or '
+                      '(at your option) any later version.\n\n'
+                      'This program is distributed in the hope that it will be useful, '
+                      'but WITHOUT ANY WARRANTY; without even the implied warranty of '
+                      'MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the '
+                      'GNU General Public License for more details.\n\n'
+                      'You should have received a copy of the GNU General Public License '
+                      'along with this program. If not, see https://www.gnu.org/licenses/',
+                      style: TextStyle(fontSize: 13, height: 1.6),
+                    ),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('关闭'),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          ListTile(
             title: const Text('使用说明'),
             subtitle: const Text('点击查看详细说明'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
