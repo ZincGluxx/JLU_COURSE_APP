@@ -579,7 +579,18 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('$section', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
-              Text(timeStr, style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+              const SizedBox(height: 2),
+              if (timeStr.contains('-')) ...[
+                Text(
+                  timeStr.split('-')[0],
+                  style: TextStyle(fontSize: 7, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+                Text(
+                  timeStr.split('-')[1],
+                  style: TextStyle(fontSize: 7, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                ),
+              ] else
+                Text(timeStr, style: TextStyle(fontSize: 7, color: Theme.of(context).colorScheme.onSurfaceVariant)),
             ],
           ),
         );
