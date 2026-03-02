@@ -4,7 +4,6 @@ import 'screens/home_screen.dart';
 import 'screens/course_edit_screen.dart';
 import 'services/course_service.dart';
 import 'services/widget_service.dart';
-import 'widgets/webview_data_importer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,23 +43,6 @@ class MyApp extends StatelessWidget {
         home: const HomeScreen(),
         routes: {
           '/course_edit': (context) => const CourseEditScreen(),
-          '/webview_import': (context) => Scaffold(
-            appBar: AppBar(
-              title: const Text('导入课表'),
-            ),
-            body: Consumer<CourseService>(
-              builder: (context, courseService, child) {
-                return WebViewDataImporter(
-                  onCoursesImported: (courses) async {
-                    await courseService.setCourses(courses);
-                    if (context.mounted) {
-                      Navigator.popUntil(context, (route) => route.isFirst);
-                    }
-                  },
-                );
-              },
-            ),
-          ),
         },
         debugShowCheckedModeBanner: false,
       ),

@@ -63,56 +63,22 @@ class SettingsScreen extends StatelessWidget {
           const _SectionHeader(title: '数据管理'),
           // 导入新学期课表
           ListTile(
-            leading: const Icon(Icons.add_circle_outline, color: Colors.teal),
-            title: const Text('导入新学期课表'),
-            subtitle: const Text('通过 WebView 浏览教务系统并导入课表'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {
-              Navigator.pushNamed(context, '/webview_import');
-            },
-          ),
-          // 重新获取课表
-          ListTile(
-            leading: const Icon(Icons.refresh, color: Colors.blue),
-            title: const Text('重新获取课表'),
-            subtitle: const Text('登录并重新导入课程数据'),
+            leading: const Icon(Icons.download_rounded, color: Colors.teal),
+            title: const Text('导入课表'),
+            subtitle: const Text('登录教务系统并导入课程数据'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
             onTap: () async {
-              final confirm = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('重新获取课表'),
-                  content: const Text('将清除现有课表数据并重新登录获取'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, false),
-                      child: const Text('取消'),
-                    ),
-                    FilledButton(
-                      onPressed: () => Navigator.pop(context, true),
-                      child: const Text('确定'),
-                    ),
-                  ],
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
                 ),
               );
-              
-              if (confirm == true && context.mounted) {
-                // 跳转到登录页面
-                final courseService = Provider.of<CourseService>(context, listen: false);
-                courseService.clearCourses(); // 清除现有数据
-                
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginScreen(),
-                  ),
+
+              if (result == true && context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('✅ 课表已更新')),
                 );
-                
-                if (result == true && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('✅ 课表已更新')),
-                  );
-                }
               }
             },
           ),
@@ -199,7 +165,7 @@ class SettingsScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 8),
                         Text(
-                          '1️⃣ 点击"重新获取课表"\n'
+                          '1️⃣ 点击"导入课表"\n'
                           '2️⃣ 在浏览器中登录 i.jlu.edu.cn\n'
                           '3️⃣ 找到并打开"我的课表"\n'
                           '4️⃣ 点击右上角下载按钮提取数据\n',
