@@ -192,13 +192,6 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
       }
     }
   }
-
-  // 导入新学期课表
-  void _importNewSemester() {
-    Navigator.of(context).pop();
-    // 导航到WebView导入页面
-    Navigator.pushNamed(context, '/webview_import');
-  }
 }
 
 // 显示学期切换对话框的便捷方法

@@ -17,27 +17,43 @@ class SettingsScreen extends StatelessWidget {
           const _SectionHeader(title: '显示设置'),
           Consumer<CourseService>(
             builder: (context, courseService, child) {
+              final startDate = courseService.semesterStartDate;
+              final dateDisplay = startDate != null
+                  ? '${startDate.year}年${startDate.month.toString().padLeft(2, '0')}月'
+                    '${startDate.day.toString().padLeft(2, '0')}日'
+                  : '暂未设置';
               return ListTile(
-                title: const Text('当前周次'),
-                subtitle: Text('第${courseService.currentWeek}周'),
-                trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                leading: const Icon(Icons.calendar_month),
+                title: const Text('开学日期'),
+                subtitle: Text(
+                  startDate != null
+                      ? '$dateDisplay（当前第${courseService.currentWeek}周）'
+                      : '点击设置开学日期，自动计算周次',
+                ),
+                trailing: const Icon(Icons.edit_calendar, size: 20),
                 onTap: () async {
-                  final result = await showDialog<int>(
+                  final now = DateTime.now();
+                  final initial = startDate ??
+                      now.subtract(Duration(days: now.weekday - 1));
+                  final picked = await showDatePicker(
                     context: context,
-                    builder: (context) => SimpleDialog(
-                      title: const Text('选择当前周次'),
-                      children: List.generate(20, (index) {
-                        final week = index + 1;
-                        return SimpleDialogOption(
-                          child: Text('第$week周'),
-                          onPressed: () => Navigator.pop(context, week),
-                        );
-                      }),
-                    ),
+                    initialDate: initial,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2030),
+                    selectableDayPredicate: (date) =>
+                        date.weekday == DateTime.monday,
+                    helpText: '选择开学日期（仅可选星期一）',
                   );
-                  
-                  if (result != null) {
-                    courseService.setCurrentWeek(result);
+                  if (picked != null && context.mounted) {
+                    try {
+                      await courseService.setSemesterStartDate(picked);
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('设置失败: $e')),
+                        );
+                      }
+                    }
                   }
                 },
               );
@@ -45,6 +61,16 @@ class SettingsScreen extends StatelessWidget {
           ),
           const Divider(),
           const _SectionHeader(title: '数据管理'),
+          // 导入新学期课表
+          ListTile(
+            leading: const Icon(Icons.add_circle_outline, color: Colors.teal),
+            title: const Text('导入新学期课表'),
+            subtitle: const Text('通过 WebView 浏览教务系统并导入课表'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              Navigator.pushNamed(context, '/webview_import');
+            },
+          ),
           // 重新获取课表
           ListTile(
             leading: const Icon(Icons.refresh, color: Colors.blue),
@@ -192,7 +218,7 @@ class SettingsScreen extends StatelessWidget {
                           '• 日视图：左右滑动切换星期\n'
                           '• 周视图：点击顶部切换按钮\n'
                           '• 课程详情：点击课程格子查看详细信息\n'
-                          '• 调整周次：在设置中修改当前周次',
+                          '• 周次计算：在设置中设置开学日期后自动计算',
                           style: TextStyle(height: 1.5),
                         ),
                       ],

@@ -449,30 +449,23 @@ class CourseService extends ChangeNotifier {
     }
   }
   
-  // 导入新学期课表（接受已解析好的课程列表）
-  Future<void> importSemesterCourses(String htmlContent, {String? semester, List<Course>? courses}) async {
+  // 导入新学期课表（WebView解析后直接传入学期和课程）
+  Future<void> importSemesterCourses({required String semester, required List<Course> courses}) async {
     try {
       _isLoading = true;
       _error = null;
       notifyListeners();
       
-      // 解析学期信息
-      final parsedSemester = semester ?? parseSemesterFromHtml(htmlContent);
-      if (parsedSemester == null) {
-        throw Exception('无法从课表数据中识别学期信息');
-      }
-      
-      // 使用传入的课程数据，如果没有则报错（解析工作由WebView组件完成）
-      if (courses == null || courses.isEmpty) {
-        throw Exception('没有解析到课程数据，请先通过WebView解析课表');
+      if (courses.isEmpty) {
+        throw Exception('没有解析到课程数据');
       }
       
       // 保存到对应学期
-      _semesterCourses[parsedSemester] = courses;
+      _semesterCourses[semester] = courses;
       
       // 如果是新学期，添加到可用列表
-      if (!_availableSemesters.contains(parsedSemester)) {
-        _availableSemesters.add(parsedSemester);
+      if (!_availableSemesters.contains(semester)) {
+        _availableSemesters.add(semester);
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('available_semesters', jsonEncode(_availableSemesters));
       }
@@ -480,9 +473,9 @@ class CourseService extends ChangeNotifier {
       // 保存课程数据
       final prefs = await SharedPreferences.getInstance();
       final coursesJson = courses.map((c) => c.toJson()).toList();
-      await prefs.setString('courses_$parsedSemester', jsonEncode(coursesJson));
+      await prefs.setString('courses_$semester', jsonEncode(coursesJson));
       
-      print('✅ 成功导入学期 $parsedSemester 的 ${courses.length} 门课程');
+      print('✅ 成功导入学期 $semester 的 ${courses.length} 门课程');
       
       _isLoading = false;
       notifyListeners();

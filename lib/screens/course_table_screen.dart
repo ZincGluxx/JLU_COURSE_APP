@@ -124,7 +124,9 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                     Text(
                       courseService.error!,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.grey),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     const SizedBox(height: 32),
                     ElevatedButton.icon(
@@ -293,14 +295,14 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                       Icon(
                         Icons.event_available,
                         size: 64,
-                        color: Colors.grey[400],
+                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         '${_weekdays[weekdayIndex]}没有课程',
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.grey[600],
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
                         ),
                       ),
                     ],
@@ -476,7 +478,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
           width: layoutParams['sectionColumnWidth']!,
           height: 28,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300, width: 0.5),
+            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 0.5),
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
           child: const Center(
@@ -493,7 +495,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
             width: layoutParams['dayColumnWidth']!,
             height: 28,
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300, width: 0.5),
+              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 0.5),
               color: isToday
                   ? Colors.amber.withOpacity(0.3)
                   : Theme.of(context).colorScheme.surfaceContainerHighest,
@@ -517,7 +519,9 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                     dateStr,
                     style: TextStyle(
                       fontSize: 8, 
-                      color: isToday ? Colors.amber.shade900 : Colors.grey[700]
+                      color: isToday
+                          ? Colors.amber.shade900
+                          : Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -568,14 +572,14 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
           width: layoutParams['sectionColumnWidth']!,
           height: cellHeight,
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey.shade300, width: 0.5),
+            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 0.5),
             color: Theme.of(context).colorScheme.surfaceContainerHighest,
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('$section', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
-              Text(timeStr, style: const TextStyle(fontSize: 8, color: Colors.grey)),
+              Text(timeStr, style: TextStyle(fontSize: 8, color: Theme.of(context).colorScheme.onSurfaceVariant)),
             ],
           ),
         );
@@ -605,7 +609,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
               return Container(
                 height: cellHeight,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.shade300, width: 0.5),
+                  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 0.5),
                   color: isToday ? Colors.amber.withOpacity(0.05) : null,
                 ),
               );
@@ -844,7 +848,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 20, color: Colors.grey[600]),
+        Icon(icon, size: 20, color: Theme.of(context).colorScheme.onSurfaceVariant),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
@@ -854,7 +858,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                 label,
                 style: TextStyle(
                   fontSize: 12,
-                  color: Colors.grey[600],
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w500,
                 ),
               ),

@@ -37,7 +37,7 @@ class LoginScreen extends StatelessWidget {
                 '简单三步获取您的课表',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Colors.grey[700],
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                 ),
               ),
               const SizedBox(height: 48),
@@ -74,7 +74,7 @@ class LoginScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
+                  color: Theme.of(context).colorScheme.primaryContainer,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Column(
@@ -82,13 +82,13 @@ class LoginScreen extends StatelessWidget {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.info_outline, size: 18, color: Colors.blue.shade700),
+                        Icon(Icons.info_outline, size: 18, color: Theme.of(context).colorScheme.onPrimaryContainer),
                         const SizedBox(width: 8),
                         Text(
                           '使用说明',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade700,
+                            color: Theme.of(context).colorScheme.onPrimaryContainer,
                           ),
                         ),
                       ],
@@ -100,7 +100,7 @@ class LoginScreen extends StatelessWidget {
                       '3️⃣ 点击右上角下载按钮',
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.blue.shade700,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
                     ),
                   ],

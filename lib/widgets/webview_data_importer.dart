@@ -416,7 +416,6 @@ class _WebViewDataImporterState extends State<WebViewDataImporter> {
                       : const Icon(Icons.event, size: 20),
                   label: const Text('导入课表'),
                   style: FilledButton.styleFrom(
-                    backgroundColor: Colors.blue,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   ),
                 ),
@@ -433,7 +432,7 @@ class _WebViewDataImporterState extends State<WebViewDataImporter> {
             _currentUrl,
             style: TextStyle(
               fontSize: 11,
-              color: Colors.grey[700],
+          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -560,7 +559,7 @@ class _WebViewDataImporterState extends State<WebViewDataImporter> {
     
     try {
       final courseService = Provider.of<CourseService>(context, listen: false);
-      await courseService.importSemesterCourses(htmlContent, semester: semester, courses: courses);
+      await courseService.importSemesterCourses(semester: semester, courses: courses);
       
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
