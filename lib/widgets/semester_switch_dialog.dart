@@ -130,14 +130,7 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
                       )
                     : const Text('切换'),
               ),
-            TextButton.icon(
-              onPressed: _isLoading ? null : _importNewSemester,
-              icon: const Icon(Icons.download, size: 16),
-              label: const Text('导入新课表'),
-              style: TextButton.styleFrom(
-                foregroundColor: Theme.of(context).primaryColor,
-              ),
-            ),
+
           ],
         );
       },
