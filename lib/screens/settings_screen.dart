@@ -4,7 +4,8 @@ import '../services/course_service.dart';
 import 'login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key});
+  final VoidCallback? onJumpToCourseTable;
+  const SettingsScreen({super.key, this.onJumpToCourseTable});
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +63,7 @@ class SettingsScreen extends StatelessWidget {
           const Divider(),
           const _SectionHeader(title: '数据管理'),
           // 导入新学期课表 - 展开样式
-          const _ImportCoursesSection(),
+          _ImportCoursesSection(onJumpToCourseTable: onJumpToCourseTable),
 
           // 清除所有数据
           ListTile(
@@ -224,18 +225,18 @@ class SettingsScreen extends StatelessWidget {
           ),
           const Divider(),
           const _SectionHeader(title: '关于'),
-          ListTile(
-            title: const Text('应用名称'),
-            subtitle: const Text('吉林大学课程表'),
+          const ListTile(
+            title: Text('应用名称'),
+            subtitle: Text('吉林大学课程表'),
           ),
-          ListTile(
-            title: const Text('版本'),
-            subtitle: const Text('1.1.1'),
+          const ListTile(
+            title: Text('版本'),
+            subtitle: Text('1.1.1'),
           ),
-          ListTile(
-            leading: const Icon(Icons.person_outline),
-            title: const Text('作者'),
-            subtitle: const Text('ZincGlux'),
+          const ListTile(
+            leading: Icon(Icons.person_outline),
+            title: Text('作者'),
+            subtitle: Text('ZincGlux'),
           ),
           ListTile(
             leading: const Icon(Icons.balance),
@@ -344,7 +345,8 @@ class SettingsScreen extends StatelessWidget {
 }
 
 class _ImportCoursesSection extends StatefulWidget {
-  const _ImportCoursesSection();
+  final VoidCallback? onJumpToCourseTable;
+  const _ImportCoursesSection({this.onJumpToCourseTable});
 
   @override
   State<_ImportCoursesSection> createState() => _ImportCoursesSectionState();
@@ -363,8 +365,9 @@ class _ImportCoursesSectionState extends State<_ImportCoursesSection> {
 
     if (result == true && context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('✅ 课表已更新')),
-      );
+          const SnackBar(content: Text(' 课表已更新')),
+        );
+        if (widget.onJumpToCourseTable != null) widget.onJumpToCourseTable!();
     }
   }
 
@@ -434,3 +437,4 @@ class _SectionHeader extends StatelessWidget {
     );
   }
 }
+

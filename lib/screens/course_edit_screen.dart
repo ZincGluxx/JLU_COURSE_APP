@@ -191,7 +191,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                     const Text('上课时间', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
                     DropdownButtonFormField<int>(
-                      value: _selectedWeekday,
+                      initialValue: _selectedWeekday,
                       decoration: const InputDecoration(
                         labelText: '星期',
                         border: OutlineInputBorder(),
@@ -217,7 +217,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                       children: [
                         Expanded(
                           child: DropdownButtonFormField<int>(
-                            value: _startSection,
+                            initialValue: _startSection,
                             decoration: const InputDecoration(
                               labelText: '开始节次',
                               border: OutlineInputBorder(),
@@ -243,7 +243,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                         const SizedBox(width: 16),
                         Expanded(
                           child: DropdownButtonFormField<int>(
-                            value: _endSection,
+                            initialValue: _endSection,
                             decoration: const InputDecoration(
                               labelText: '结束节次',
                               border: OutlineInputBorder(),
@@ -252,7 +252,7 @@ class _CourseEditScreenState extends State<CourseEditScreen> {
                                 .where((section) => section >= _startSection)
                                 .map((section) => DropdownMenuItem(
                                   value: section,
-                                  child: Text('第${section}节'),
+                                  child: Text('第$section节'),
                                 ))
                                 .toList(),
                             onChanged: (value) {

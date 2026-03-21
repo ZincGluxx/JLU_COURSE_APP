@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+﻿import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 import '../models/course.dart';
@@ -6,12 +6,13 @@ import '../models/course.dart';
 class CourseService extends ChangeNotifier {
   List<Course> _courses = [];
   int _currentWeek = 1;
-  bool _isLoading = false;
+  final bool _isLoading = false;
   String? _error;
   DateTime? _semesterStartDate; // 学期开始日期（总是星期一）
   String _currentSemester = '2025-2026-2'; // 当前学期
   List<String> _availableSemesters = ['2025-2026-2']; // 可用学期列表
-  Map<String, List<Course>> _semesterCourses = {}; // 各学期的课程数据
+  final Map<String, List<Course>> _semesterCourses = {}; // 各学期的课程数据
+  int _dataVersion = 0;
 
   List<Course> get courses => _courses;
   int get currentWeek => _currentWeek;
@@ -20,6 +21,7 @@ class CourseService extends ChangeNotifier {
   DateTime? get semesterStartDate => _semesterStartDate;
   String get currentSemester => _currentSemester;
   List<String> get availableSemesters => _availableSemesters;
+  int get dataVersion => _dataVersion;
   
   CourseService() {
     // 初始化时加载缓存数据和设置
@@ -67,11 +69,9 @@ class CourseService extends ChangeNotifier {
   // 根据当前日期自动更新周次
   void _updateCurrentWeek() {
     if (_semesterStartDate == null) return;
-    
     final now = DateTime.now();
-    final diff = now.difference(_semesterStartDate!);
-    final week = (diff.inDays / 7).floor() + 1;
-    
+    final difference = now.difference(_semesterStartDate!);
+    final week = (difference.inDays / 7).floor() + 1;
     if (week > 0 && week <= 20) {
       _currentWeek = week;
       notifyListeners();
@@ -195,7 +195,7 @@ class CourseService extends ChangeNotifier {
     _courses = [];
     _currentWeek = 1;
     _error = null;
-    notifyListeners();
+    _dataVersion++; notifyListeners();
   }
 
   // 保存课程（从HTML导入）
@@ -213,7 +213,7 @@ class CourseService extends ChangeNotifier {
       print('❌ 保存课程失败: $e');
     }
     
-    notifyListeners();
+    _dataVersion++; notifyListeners();
   }
 
   // 合并连续节次的相同课程
@@ -295,7 +295,7 @@ class CourseService extends ChangeNotifier {
       print('❌ 清除课程数据失败: $e');
     }
     
-    notifyListeners();
+    _dataVersion++; notifyListeners();
   }
 
   // 从本地加载缓存的课程
@@ -308,7 +308,7 @@ class CourseService extends ChangeNotifier {
         final coursesJson = jsonDecode(coursesJsonStr) as List;
         _courses = coursesJson.map((json) => Course.fromJson(json)).toList();
         print('✅ 从缓存加载了 ${_courses.length} 门课程');
-        notifyListeners();
+        _dataVersion++; notifyListeners();
       }
     } catch (e) {
       print('❌ 加载缓存课程失败: $e');
@@ -320,7 +320,7 @@ class CourseService extends ChangeNotifier {
     try {
       _courses.add(course);
       await _saveCourses();
-      notifyListeners();
+      _dataVersion++; notifyListeners();
     } catch (e) {
       print('❌ 添加自定义课程失败: $e');
       rethrow;
@@ -333,7 +333,7 @@ class CourseService extends ChangeNotifier {
       _courses = courses;
       _semesterCourses[_currentSemester] = courses;
       await _saveCourses();
-      notifyListeners();
+      _dataVersion++; notifyListeners();
       print('✅ 已设置 ${courses.length} 门课程到学期 $_currentSemester');
     } catch (e) {
       print('❌ 设置课程失败: $e');
@@ -348,7 +348,7 @@ class CourseService extends ChangeNotifier {
       if (index != -1) {
         _courses[index] = updatedCourse;
         await _saveCourses();
-        notifyListeners();
+        _dataVersion++; notifyListeners();
       }
     } catch (e) {
       print('❌ 更新自定义课程失败: $e');
@@ -361,7 +361,7 @@ class CourseService extends ChangeNotifier {
     try {
       _courses.removeWhere((c) => c.id == courseId);
       await _saveCourses();
-      notifyListeners();
+      _dataVersion++; notifyListeners();
     } catch (e) {
       print('❌ 删除自定义课程失败: $e');
       rethrow;
@@ -409,7 +409,7 @@ class CourseService extends ChangeNotifier {
       }
       
       print('✅ 切换到学期: $semester，课程数量: ${_courses.length}');
-      notifyListeners();
+      _dataVersion++; notifyListeners();
     } catch (e) {
       print('❌ 切换学期失败: $e');
       rethrow;
@@ -419,9 +419,12 @@ class CourseService extends ChangeNotifier {
   // 保存课程到指定学期（非破坏性 — 不切换当前学期）
   Future<void> saveCoursesForSemester(String semester, List<Course> courses) async {
     final merged = _mergeContinuousCourses(courses);
-    _semesterCourses[semester] = merged;
+      _semesterCourses[semester] = merged;
+      if (semester == _currentSemester) {
+        _courses = merged;
+      }
 
-    try {
+      try {
       final prefs = await SharedPreferences.getInstance();
       final coursesJson = merged.map((c) => c.toJson()).toList();
       await prefs.setString('courses_$semester', jsonEncode(coursesJson));
@@ -437,7 +440,7 @@ class CourseService extends ChangeNotifier {
       rethrow;
     }
 
-    notifyListeners();
+    _dataVersion++; notifyListeners();
   }
 
   // 删除学期数据
@@ -460,10 +463,13 @@ class CourseService extends ChangeNotifier {
       await prefs.setString('available_semesters', jsonEncode(_availableSemesters));
       
       print('✅ 已删除学期: $semester');
-      notifyListeners();
+      _dataVersion++; notifyListeners();
     } catch (e) {
       print('❌ 删除学期失败: $e');
       rethrow;
     }
   }
 }
+
+
+

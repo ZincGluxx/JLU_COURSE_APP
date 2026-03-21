@@ -48,7 +48,7 @@ class WidgetService {
       final widgetData = {
         'date': '${today.month}/${today.day}',
         'weekday': _getWeekdayName(weekday),
-        'week': '第${currentWeek}周',
+        'week': '第$currentWeek周',
         'courseCount': todayCourses.length,
         'courses': todayCourses.map((course) => {
           'name': course.name,
@@ -137,9 +137,9 @@ class WidgetService {
     final minutes = difference.inMinutes % 60;
     
     if (hours > 0) {
-      return '${hours}小时${minutes}分钟后';
+      return '$hours小时$minutes分钟后';
     } else {
-      return '${minutes}分钟后';
+      return '$minutes分钟后';
     }
   }
   

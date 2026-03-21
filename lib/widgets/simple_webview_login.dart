@@ -212,26 +212,91 @@ class _SimpleWebViewLoginState extends State<SimpleWebViewLogin> {
               
               var roomText = roomEl.textContent.trim();
               
-              // 4. 解析周次（"2-10周" -> [2,3,4,5,6,7,8,9,10]）
+              // 4. 解析周次，支持间周上课、连续周次和多段周次
               var weeks = [];
-              var weekMatch = roomText.match(/(\\d+)-(\\d+)周/);
-              if (weekMatch) {
-                var start = parseInt(weekMatch[1]);
-                var end = parseInt(weekMatch[2]);
-                for (var w = start; w <= end; w++) {
-                  weeks.push(w);
-                }
-              } else {
-                var singleMatch = roomText.match(/(\\d+)周/);
-                if (singleMatch) {
-                  weeks.push(parseInt(singleMatch[1]));
+
+              // 1. 优先检查间周上课格式（单周/双周）
+              var intervalMatch = roomText.match(/(\\d+)-(\\d+)周[\\s]*[\\(（]([单双])[周]?[\\)）]/);
+              if (intervalMatch) {
+                // 间周上课：如"1-15周(单周)" 或 "2-16周(双周)"
+                var start = parseInt(intervalMatch[1]);
+                var end = parseInt(intervalMatch[2]);
+                var type = intervalMatch[3]; // "单" 或 "双"
+
+                console.log('[周次解析] 检测到间周上课:', start, '-', end, '周(', type, ')');
+
+                if (type === '单') {
+                  // 单周：奇数周
+                  for (var w = start; w <= end; w++) {
+                    if (w % 2 === 1) {
+                      weeks.push(w);
+                    }
+                  }
+                } else if (type === '双') {
+                  // 双周：偶数周
+                  for (var w = start; w <= end; w++) {
+                    if (w % 2 === 0) {
+                      weeks.push(w);
+                    }
+                  }
                 }
               }
+              // 2. 检查多段周次格式，如"1-4周,6-13周"
+              else {
+                var multiRangeMatch = roomText.match(/(\\d+\\-\\d+周(?:[,，]\\s*\\d+\\-\\d+周)*)/);
+                if (multiRangeMatch) {
+                  var rangeText = multiRangeMatch[1];
+                  var ranges = rangeText.split(/[,，]/);
+
+                  console.log('[周次解析] 检测到多段周次:', ranges.length, '段');
+
+                  ranges.forEach(function(range) {
+                    var rangeMatch = range.trim().match(/(\\d+)-(\\d+)周/);
+                    if (rangeMatch) {
+                      var start = parseInt(rangeMatch[1]);
+                      var end = parseInt(rangeMatch[2]);
+                      console.log('[周次解析] 处理范围:', start, '-', end, '周');
+                      for (var w = start; w <= end; w++) {
+                        if (weeks.indexOf(w) === -1) {
+                          weeks.push(w);
+                        }
+                      }
+                    }
+                  });
+                }
+                // 3. 普通连续周次格式
+                else {
+                  var weekMatch = roomText.match(/(\\d+)-(\\d+)周/);
+                  if (weekMatch) {
+                    // 连续周次："2-10周" -> [2,3,4,5,6,7,8,9,10]
+                    var start = parseInt(weekMatch[1]);
+                    var end = parseInt(weekMatch[2]);
+                    console.log('[周次解析] 连续周次:', start, '-', end, '周');
+                    for (var w = start; w <= end; w++) {
+                      weeks.push(w);
+                    }
+                  }
+                  // 4. 单周格式："5周" -> [5]
+                  else {
+                    var singleMatch = roomText.match(/(\\d+)周/);
+                    if (singleMatch) {
+                      var w = parseInt(singleMatch[1]);
+                      console.log('[周次解析] 单周:', w, '周');
+                      weeks.push(w);
+                    }
+                  }
+                }
+              }
+
+              // 排序周次数组
+              weeks.sort(function(a, b) { return a - b; });
               
               if (weeks.length === 0) {
                 console.log('[课程', idx, name, '] 跳过：周次解析失败，原文:', roomText);
                 return;
               }
+
+              console.log('[课程', idx, name, '] 周次解析成功:', weeks.length, '个周次:', weeks);
               
               // 5. 解析星期（"星期5" -> 5）
               var weekday = 0;
@@ -266,11 +331,24 @@ class _SimpleWebViewLoginState extends State<SimpleWebViewLogin> {
                 return;
               }
               
-              // 7. 解析地点（逗号分隔的第4部分）
-              var location = '';
-              var parts = roomText.split(',');
-              if (parts.length >= 4) {
-                location = parts[3].replace(/<[^>]+>/g, '').trim();
+// 7. 解析地点（由于前面的段数可能不固定，因此截取剩下的部分为主）
+                        // 典型的输入可能是: 2-10周,星期5,第1节-第4节,李四波,逸夫第十一阶梯
+                        // 这里面可能还包含老师名字，因此把属于地点部分的尝试提取出来
+                        var location = '';
+                        var parts = roomText.split(',');
+                        // 如果大于3部分，剩下的基本是：教师（有时有，有时无），地点
+                        // 为了准确性，我们找到第一个既没有"周"、"星期"、"节"字样的部分，往往就是地点
+                        for (var i = 0; i < parts.length; i++) {
+                            var part = parts[i].trim();
+                            if (part && !part.includes('周') && !part.includes('星期') && !part.includes('节')) {
+                                // 可能还会遇到教师名，通常地点比较长或者有特定的关键字（比如楼、阶梯、教室等）
+                                // 作为保守策略，选取排在最后的一项作为地点
+                                location = parts[parts.length - 1].replace(/<[^>]+>/g, '').trim();
+                            }
+                        }
+                        // 处理 fallback
+                        if (!location && parts.length >= 4) {
+                            location = parts[parts.length - 1].replace(/<[^>]+>/g, '').trim();
               }
               
               // 8. 构建课程对象

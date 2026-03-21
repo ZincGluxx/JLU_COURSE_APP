@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/course_service.dart';
 import '../models/course.dart';
-import '../widgets/course_card.dart';
 import '../widgets/semester_switch_dialog.dart';
 import 'course_edit_screen.dart';
 
@@ -15,10 +14,9 @@ class CourseTableScreen extends StatefulWidget {
 
 class _CourseTableScreenState extends State<CourseTableScreen> {
   late PageController _weekPageController; // 周视图的PageView控制器
-  late PageController _dayPageController; // 日视图的PageView控制器
   final List<String> _weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
-  bool _isWeekView = true; // 默认为周视图
   int _displayWeek = 1; // 当前显示的周次
+  int _lastDataVersion = -1; // 用于检测缓存失效
   
   // 性能优化缓存
   Map<String, Widget>? _weekViewCache; // 周视图缓存
@@ -56,7 +54,6 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
     super.initState();
     // 立即初始化PageController，使用默认值
     _weekPageController = PageController(initialPage: 0);
-    _dayPageController = PageController(initialPage: 0);
     
     // 在首帧后根据实际数据更新页面
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,11 +62,6 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
       // 跳转到当前周
       if (_weekPageController.hasClients) {
         _weekPageController.jumpToPage(courseService.currentWeek - 1);
-      }
-      // 跳转到今天
-      final today = courseService.getTodayWeekday();
-      if (_dayPageController.hasClients) {
-        _dayPageController.jumpToPage(today - 1);
       }
       
       // 初始化缓存
@@ -81,7 +73,6 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
   @override
   void dispose() {
     _weekPageController.dispose();
-    _dayPageController.dispose();
     _clearCache();
     super.dispose();
   }
@@ -100,6 +91,16 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
   Widget build(BuildContext context) {
     return Consumer<CourseService>(
       builder: (context, courseService, child) {
+        if (_lastDataVersion != courseService.dataVersion) {
+          _clearCache();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted && _weekPageController.hasClients) {
+              _weekPageController.jumpToPage(courseService.currentWeek - 1);
+            }
+          });
+          _displayWeek = courseService.currentWeek;
+          _lastDataVersion = courseService.dataVersion;
+        }
         if (courseService.isLoading) {
           return const Scaffold(
             body: Center(child: CircularProgressIndicator()),
@@ -166,34 +167,16 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                   Navigator.pushNamed(context, '/course_edit');
                 },
               ),
-              // 视图切换按钮
-              IconButton(
-                icon: Icon(_isWeekView ? Icons.view_day : Icons.view_week),
-                tooltip: _isWeekView ? '切换到日视图' : '切换到周视图',
-                onPressed: () {
-                  setState(() {
-                    _isWeekView = !_isWeekView;
-                  });
-                },
-              ),
               // 周数切换（左箭头）
               IconButton(
                 icon: const Icon(Icons.chevron_left),
                 onPressed: _displayWeek > 1
                     ? () {
-                        if (_isWeekView) {
-                          _weekPageController.previousPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        } else {
-                          setState(() {
-                            _displayWeek--;
-                            courseService.setCurrentWeek(_displayWeek);
-                          });
-                        }
-                      }
-                    : null,
+                        _weekPageController.previousPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                    } : null,
               ),
               // 周数显示
               Padding(
@@ -210,19 +193,11 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                 icon: const Icon(Icons.chevron_right),
                 onPressed: _displayWeek < 20
                     ? () {
-                        if (_isWeekView) {
-                          _weekPageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        } else {
-                          setState(() {
-                            _displayWeek++;
-                            courseService.setCurrentWeek(_displayWeek);
-                          });
-                        }
-                      }
-                    : null,
+                        _weekPageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                    } : null,
               ),
               IconButton(
                 icon: const Icon(Icons.swap_horiz),
@@ -231,8 +206,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
               ),
             ],
           ),
-          body: _isWeekView 
-              ? PageView.builder(
+          body: PageView.builder(
                   controller: _weekPageController,
                   itemCount: 20,
                   onPageChanged: (page) {
@@ -248,82 +222,12 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
                   itemBuilder: (context, index) {
                     return _buildWeekView(courseService, index + 1);
                   },
-                )
-              : _buildDayView(courseService),
+                ),
         );
       },
     );
   }
 
-  // 日视图（原来的视图）
-  Widget _buildDayView(CourseService courseService) {
-    return Column(
-      children: [
-        // 星期标签
-        Container(
-          height: 50,
-          color: Theme.of(context).colorScheme.surfaceContainerHighest,
-          child: Row(
-            children: _weekdays.map((day) {
-              return Expanded(
-                child: Center(
-                  child: Text(
-                    day,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        // 课程表内容
-        Expanded(
-          child: PageView.builder(
-            controller: _dayPageController,
-            itemCount: 7,
-            itemBuilder: (context, weekdayIndex) {
-              final courses = courseService.getCoursesByWeekAndDay(
-                courseService.currentWeek,
-                weekdayIndex + 1,
-              );
-
-              if (courses.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.event_available,
-                        size: 64,
-                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        '${_weekdays[weekdayIndex]}没有课程',
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: courses.length,
-                itemBuilder: (context, index) {
-                  final color = _getCourseColor(courses[index].name);
-                  return CourseCard(course: courses[index], courseColor: color);
-                },
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
 
   // 周视图（网格视图）- 性能优化版本
   Widget _buildWeekView(CourseService courseService, int week) {
@@ -936,3 +840,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
     return semester;
   }
 }
+
+
+
+

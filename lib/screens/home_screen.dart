@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'course_table_screen.dart';
 import 'settings_screen.dart';
 
@@ -12,15 +12,19 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  final List<Widget> _screens = [
-    const CourseTableScreen(),
-    const SettingsScreen(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final screens = [
+      const CourseTableScreen(),
+      SettingsScreen(onJumpToCourseTable: () {
+        setState(() {
+          _selectedIndex = 0;
+        });
+      }),
+    ];
+
     return Scaffold(
-      body: _screens[_selectedIndex],
+      body: screens[_selectedIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex,
         onDestinationSelected: (index) {
@@ -42,3 +46,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+

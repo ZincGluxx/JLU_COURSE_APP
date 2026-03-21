@@ -84,7 +84,7 @@ class _SemesterSwitchDialogState extends State<SemesterSwitchDialog> {
                     activeColor: Theme.of(context).primaryColor,
                   ),
                 );
-              }).toList(),
+              }),
               if (availableSemesters.length <= 1)
                 Card(
                   color: Theme.of(context).colorScheme.surface,
