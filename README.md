@@ -1,249 +1,79 @@
-# 吉林大学课程表 App
+# 吉林大学课程表 App (JLU Course App)
 
-这是一个基于 Flutter 开发的吉林大学课程表应用，支持查看课程表、查询成绩和设置课程提醒功能。
+这是一个专为吉林大学学生打造的轻量级、免服务器、基于 Flutter 开发的本地化课程表与教务辅助应用。
+核心特性为**纯本地解析**：直接通过内置浏览器 (WebView) 登录吉林大学教务系统并拉取数据，数据直接存储在本地，不经过任何第三方服务器，最大化保障您的账号安全和隐私。
 
-## 功能特性
+---
 
-- ✅ **课程表查看**：按周次和星期显示课程安排
-- ✅ **成绩查询**：查看所有课程成绩和GPA
-- ✅ **课程提醒**：支持课前提醒通知
-- ✅ **周次切换**：方便查看不同周次的课程
-- ✅ **详细信息**：查看课程的教师、地点、时间等详细信息
+## 🌟 核心特性
 
-## 截图
+- 🔒 **纯本地无后端验证**：彻底基于内置 WebView + 注入 JS 脚本爬取数据，告别第三方服务泄露密码的担忧。（已适配金智教务系统）
+- 📅 **智能周视图展示**：精简清晰的课程表网格界面，支持周次切换，按周次和星期直观显示课程。
+- ⚡ **导入后热重载刷新**：导入或者更新课表成功后，系统会自动清理底层缓存并直接无缝刷新主课表界面，无需再手动刷新。
+- 📍 **高精度课程解析**：深度优化的地点解析正则逻辑，精准剥离“周”、“星期”、“节”等干扰文本，保障教室位置等信息显示准确。
+- 🗑️ **清爽 UI 体验**：移除冗余的日视图，完全聚焦于实用的周排版。
 
-（待添加应用截图）
+---
 
-## 技术栈
+## 🛠️ 技术栈
 
-- Flutter 3.0+
-- Dart 3.0+
-- Provider (状态管理)
-- flutter_local_notifications (本地通知)
-- http (网络请求)
+- **框架**: Flutter 3.0+ (Dart 3.0+)
+- **状态管理**: Provider
+- **核心依赖**:
+  - `webview_flutter`: 提供安全的内置浏览器运行环境。
+  - `shared_preferences`: 进行轻量级本地数据持久化持久化存储。
 
-## 安装和运行
+---
 
-### 前置要求
+## 📦 安装与下载
 
-1. 安装 [Flutter SDK](https://flutter.dev/docs/get-started/install)
-2. 安装 Android Studio 或 VS Code
-3. 配置 Android 开发环境
+前往 [Releases](https://github.com/ZincGluxx/JLU_COURSE_APP/releases) 页面下载最新版本的 Android APK 安装包（提供 `arm64-v8a` 和 `armeabi-v7a` 双架构版本）。
 
-### 安装步骤
+### 编译源码提示
 
-1. 克隆或下载项目到本地
-   ```bash
-   cd jlu_course_app
-   ```
+> 如果你需要自己编译源码，由于国内网络环境，可能需要配置相关镜像。
 
-2. 获取依赖
-   ```bash
-   flutter pub get
-   ```
-
-3. 运行应用（移动端）
-   ```bash
-   flutter run
-   ```
-
-4. 在浏览器测试（Web）
-   ```bash
-   flutter run -d edge
-   ```
-
-5. 构建 APK
-   ```bash
-   flutter build apk --release
-   ```
-   生成的 APK 文件位于 `build/app/outputs/flutter-apk/app-release.apk`
-
-## API 配置
-
-### 重要提示
-
-**当前应用已集成吉林大学金智教务系统 API 支持，但需要手动配置具体的接口参数。**
-
-吉林大学使用的是 **金智教务系统**，教务系统地址：
-- 主站: https://iedu.jlu.edu.cn/
-- 课程表: https://iedu.jlu.edu.cn/jwapp/sys/wdkb/*default/index.do
-
-### 快速配置（三步走）
-
-#### 第一步：使用 Python 脚本测试 API
-
-1. 安装 Python 依赖：
-   ```bash
-   pip install requests beautifulsoup4
-   ```
-
-2. 运行测试脚本：
-   ```bash
-   cd tools
-   python jlu_api_test.py
-   ```
-
-3. 根据脚本输出查看实际的 API 响应格式
-
-#### 第二步：抓包获取 API 接口
-
-使用浏览器开发者工具（F12）：
-1. 登录教务系统
-2. 打开 Network 标签
-3. 筛选 XHR 请求
-4. 找到课程表和成绩的 API 接口
-5. 记录 URL、请求头和参数
-
-详细步骤请查看：[JLU_API_GUIDE.md](JLU_API_GUIDE.md)
-
-#### 第三步：更新代码配置
-
-1. 打开 `lib/services/jlu_api_service.dart`
-
-2. 修改 API 路径（根据抓包结果）：
-   ```dart
-   static const String loginPath = '/你抓包看到的登录路径';
-   static const String coursePath = '/你抓包看到的课程表路径';
-   static const String gradePath = '/你抓包看到的成绩路径';
-   ```
-
-3. 修改字段映射（根据实际响应数据）：
-   ```dart
-   Course _parseCourse(Map<String, dynamic> json) {
-     return Course(
-       id: json['实际的课程ID字段'] ?? '',
-       name: json['实际的课程名字段'] ?? '',
-       // ... 其他字段
-     );
-   }
-   ```
-
-### 详细文档
-
-- [API 对接完整指南](JLU_API_GUIDE.md) - API 接口详细说明
-- [爬虫使用教程](CRAWLER_USAGE.md) - 抓包和配置步骤
-- [工具脚本说明](tools/README.md) - Python 测试脚本使用
-
-### API 数据格式
-
-#### 课程表数据格式 (Course)
-```json
-{
-  "id": "1",
-  "name": "高等数学",
-  "teacher": "张教授",
-  "location": "东荣大厦A座201",
-  "weekday": 1,
-  "startSection": 1,
-  "endSection": 2,
-  "weeks": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-  "description": "必修课"
-}
+```powershell
+# Windows PowerShell 环境下的镜像配置与打包命令
+$env:PUB_HOSTED_URL="https://pub.flutter-io.cn"
+$env:FLUTTER_STORAGE_BASE_URL="https://storage.flutter-io.cn"
+.\flutter\bin\flutter.bat build apk --split-per-abi --release
 ```
 
-#### 成绩数据格式 (Grade)
-```json
-{
-  "courseId": "1",
-  "courseName": "高等数学",
-  "credit": "5.0",
-  "score": "92",
-  "gradePoint": "4.2",
-  "semester": "2024-2025学年第一学期",
-  "examType": "期末考试"
-}
-```
+打包生成的产物路径位于：`build/app/outputs/flutter-apk/`
 
-## 项目结构
+---
 
-```
-lib/
-├── main.dart                 # 应用入口
-├── models/                   # 数据模型
-│   ├── course.dart          # 课程模型
-│   └── grade.dart           # 成绩模型
-├── services/                # 服务层
-│   ├── api_service.dart     # API 接口服务
-│   ├── course_service.dart  # 课程业务逻辑
-│   └── notification_service.dart  # 通知服务
-├── screens/                 # 页面
-│   ├── home_screen.dart           # 主页
-│   ├── course_table_screen.dart   # 课程表页面
-│   ├── grades_screen.dart         # 成绩页面
-│   └── settings_screen.dart       # 设置页面
-└── widgets/                 # 自定义组件
-    └── course_card.dart     # 课程卡片组件
-```
+## 🚀 核心工作原理设计
 
-## 使用说明
+如何实现不需要后端服务器获取吉林大学教务系统数据的？
 
-### 首次使用
+1. **WebView 登录代理**：利用 `webview_flutter` 插件打开吉林的统一身份认证 / 教务系统页面（如 `https://iedu.jlu.edu.cn/`）。
+2. **Javascript 注入**：用户在 WebView 登录成功后，App 会在后台自动执行预先写好的 JavaScript 脚本。
+3. **DOM 解析与提取**：注入的 JS 脚本自动抓取页面 DOM 中的课表 HTML 元素进行正则分析还原。
+4. **回传与持久化**：JS 脚本通过 `JavascriptChannel` 与 Flutter 宿主通信，将提取清洗后的 JSON 数据传回 Flutter 引擎，利用 SharedPreferences 写入本地缓存并立即热重载刷新 UI。
 
-1. **登录教务系统**
-   - 打开应用，进入"设置"页面
-   - 点击"未登录"
-   - 输入学号和密码登录
-   - 登录成功后自动获取课程表和成绩
+---
 
-2. **不登录使用（体验模式）**
-   - 点击"暂不登录，使用模拟数据"
-   - 可以体验应用的所有功能
-   - 显示的是模拟数据
+## 📖 开发者文档与脚本工具
 
-### 查看课程表
-- 左右滑动可以切换不同星期
-- 点击右上角可以选择查看的周次
-- 点击课程卡片可以查看详细信息
+如果您想要进一步了解接口或贡献代码，项目内附带了完善的 API 研究文档和辅助 Python 脚本：
 
-### 查询成绩
-- 在底部导航栏点击"成绩"标签
-- 可以看到所有课程成绩和平均绩点
-- 显示学分、绩点等详细信息
+- **抓包与脚本使用教程**: [CRAWLER_USAGE.md](CRAWLER_USAGE.md)、[tools/README.md](tools/README.md)
+- **教务 API 对接详细文档**: [JLU_API_GUIDE.md](JLU_API_GUIDE.md)、[WEBVIEW_LOGIN_GUIDE.md](WEBVIEW_LOGIN_GUIDE.md)
+- Python 抓包分析脚本统一存放在 `tools/` 根目录下，用于帮助开发者在 PC 端调试和拆解教务处返回的最新结构。
 
-### 设置课程提醒
-1. 在底部导航栏点击"设置"标签
-2. 开启"课程提醒"开关
-3. 选择提前提醒的时间（5/10/15/20/30分钟）
-4. 应用会在课程开始前发送通知
+---
 
-###功能开发进度
+## 🤝 贡献指南
 
-- [x] 课程表查看（支持周次切换）
-- [x] 成绩查询（包含 GPA 计算）
-- [x] 课程提醒功能
-- [x] 用户登录功能（金智教务系统）
-- [x] 账号管理（登录/退出）
-- [ ] 支持自定义课程颜色
-- [ ] 添加课程笔记功能
-- [ ] 支持导出课程表为图片
-- [ ] 添加考试倒计时功能
-- [ ] 支持暗黑模式
-- [ ] 考试安排查询
-- [ ] 空闲教室查询林大学的课程表 API？
-A: 需要联系吉林大学教务处或相关技术部门获取API接口文档和访问权限。
+1. Fork 本仓库
+2. 创建您的特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交您的修改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启一个 Pull Request
 
-### Q: 如何添加登录功能？
-A: 可以在 `lib/screens/` 目录下添加 `login_screen.dart`，实现用户登录逻辑，并在 `lib/services/api_service.dart` 中添加 token 管理。
+---
 
-### Q: 通知不起作用？
-A: 请确保：
-1. 已授予应用通知权限
-2. Android 版本支持（需要 Android 8.0+）
-3. 正确设置了学期开始日期
-
-## 后续开发计划
-
-- [ ] 添加用户登录功能
-- [ ] 支持自定义课程颜色
-- [ ] 添加课程笔记功能
-- [ ] 支持导出课程表为图片
-- [ ] 添加考试倒计时功能
-- [ ] 支持暗黑模式
-
-## 开发者
-
-如有问题或建议，欢迎提出 Issue。
-
-## 许可证
-
-MIT License
+## 📄 License
+该项目基于 **MIT License** 开源。
