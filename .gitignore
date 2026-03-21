@@ -41,5 +41,17 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Android Gradle 相关
+/android/.gradle/
+/android/local.properties
+/android/gradle.properties
+/android/key.properties
+
+# 临时文件和脚本
+*.tmp
+*.temp
+replace*.py
+body.html
+
 # Flutter SDK (本地安装的 Flutter SDK，不需要上传)
 /flutter/
