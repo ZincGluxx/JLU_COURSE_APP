@@ -91,6 +91,25 @@ body.html
 .env.local
 .env.*.local
 # Local Test Data & Scripts
+
+*.html
+
+!web/index.html
+
+!test/*.html
+
+*.txt
+
+*.har
+
+*.bat
+
+!android/gradlew.bat
+
+jd-xhh.jpg
+
+
+# Local Test Data & Scripts
 *.html
 !web/index.html
 !test/*.html
