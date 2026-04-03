@@ -18,6 +18,7 @@ migrate_working_dir/
 
 # VS Code related
 .vscode/
+*.code-workspace
 
 # Flutter/Dart/Pub related
 **/doc/api/
@@ -40,12 +41,34 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-
-# Android Gradle 相关
 /android/.gradle/
 /android/local.properties
 /android/gradle.properties
 /android/key.properties
+
+# iOS build related
+/ios/Flutter/Flutter.framework
+/ios/Flutter/Flutter.podspec
+/ios/Flutter/Flutter.xcframework
+/ios/Flutter/flutterfire_cli_commands.sh
+
+# macOS build related
+/macos/Flutter/Flutter.framework
+/macos/Flutter/Flutter.xcframework
+/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Web build related
+/web/flutter_service_worker.js
+
+# Windows build related
+/windows/flutter/generated_plugin_registrant.cc
+/windows/flutter/generated_plugins.cmake
+
+# Generated plugin files
+/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+
+# DevTools
+devtools_options.yaml
 
 # 临时文件和脚本
 *.tmp
@@ -53,5 +76,17 @@ app.*.map.json
 replace*.py
 body.html
 
+# IDE 生成的文件
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 # Flutter SDK (本地安装的 Flutter SDK，不需要上传)
 /flutter/
+
+# 环境文件
+.env
+.env.local
+.env.*.local

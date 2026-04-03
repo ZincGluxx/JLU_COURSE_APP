@@ -37,6 +37,7 @@ class CourseService extends ChangeNotifier {
       final startDateStr = prefs.getString('semester_start_date');
       if (startDateStr != null) {
         _semesterStartDate = DateTime.parse(startDateStr);
+        _updateCurrentWeek(); // 加载成功后更新当前周
       }
       
       // 加载当前学期
@@ -70,10 +71,22 @@ class CourseService extends ChangeNotifier {
   void _updateCurrentWeek() {
     if (_semesterStartDate == null) return;
     final now = DateTime.now();
-    final difference = now.difference(_semesterStartDate!);
-    final week = (difference.inDays / 7).floor() + 1;
-    if (week > 0 && week <= 20) {
+    
+    // 只比较日期部分，忽略时间部分的差异
+    final nowDate = DateTime(now.year, now.month, now.day);
+    final startDate = DateTime(_semesterStartDate!.year, _semesterStartDate!.month, _semesterStartDate!.day);
+    
+    final difference = nowDate.difference(startDate);
+    int week = (difference.inDays / 7).floor() + 1;
+    
+    // 限制在1-20周之内
+    if (week < 1) week = 1;
+    if (week > 20) week = 20;
+    
+    if (_currentWeek != week) {
       _currentWeek = week;
+      // 增加数据版本号，以便 UI 可以感知并跳转到对应的周次视图
+      _dataVersion++; 
       notifyListeners();
     }
   }

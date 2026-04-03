@@ -382,8 +382,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
           width: layoutParams['sectionColumnWidth']!,
           height: 28,
           decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 0.5),
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
           ),
           child: const Center(
             child: Text('节次', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
@@ -399,10 +398,9 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
             width: layoutParams['dayColumnWidth']!,
             height: 28,
             decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 0.5),
               color: isToday
                   ? Colors.amber.withOpacity(0.3)
-                  : Theme.of(context).colorScheme.surfaceContainerHighest,
+                  : Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.5),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -476,8 +474,7 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
           width: layoutParams['sectionColumnWidth']!,
           height: cellHeight,
           decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 0.5),
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest.withOpacity(0.3),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -521,10 +518,20 @@ class _CourseTableScreenState extends State<CourseTableScreen> {
           // 背景网格
           Column(
             children: List.generate(maxSections, (sectionIndex) {
+              // 给网格增加极简的浅色虚线感或干脆仅保留极浅的底边和右边
               return Container(
                 height: cellHeight,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).colorScheme.outlineVariant, width: 0.5),
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.2),
+                      width: 0.5,
+                    ),
+                    right: BorderSide(
+                      color: Theme.of(context).colorScheme.outlineVariant.withOpacity(0.1),
+                      width: 0.5,
+                    ),
+                  ),
                   color: isToday ? Colors.amber.withOpacity(0.05) : null,
                 ),
               );

@@ -1,4 +1,4 @@
-﻿name: jlu_course_app
+name: jlu_course_app
 description: 吉林大学课程表应用
 publish_to: 'none'
 version: 1.2.0+4
@@ -15,6 +15,7 @@ dependencies:
   webview_flutter_web: ^0.2.2
   # 桌面小组件
   home_widget: ^0.6.0
+  dynamic_color: ^1.8.1
 
 dev_dependencies:
   flutter_test:
