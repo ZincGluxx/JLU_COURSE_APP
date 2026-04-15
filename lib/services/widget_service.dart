@@ -92,20 +92,20 @@ class WidgetService {
     
     final currentTime = now.hour * 60 + now.minute;
     
-    // 课程时间表 (分钟)
+    // 课程时间表 (分钟)，对应吉林大学实际作息时间
     final classSchedule = {
       1: 8 * 60 + 0,   // 8:00
-      2: 8 * 60 + 50,  // 8:50
+      2: 8 * 60 + 55,  // 8:55
       3: 10 * 60 + 0,  // 10:00
-      4: 10 * 60 + 50, // 10:50
-      5: 14 * 60 + 0,  // 14:00
-      6: 14 * 60 + 50, // 14:50
-      7: 16 * 60 + 0,  // 16:00
-      8: 16 * 60 + 50, // 16:50
-      9: 19 * 60 + 0,  // 19:00
-      10: 19 * 60 + 50, // 19:50
-      11: 20 * 60 + 40, // 20:40
-      12: 21 * 60 + 30, // 21:30
+      4: 10 * 60 + 55, // 10:55
+      5: 13 * 60 + 30, // 13:30
+      6: 14 * 60 + 25, // 14:25
+      7: 15 * 60 + 30, // 15:30
+      8: 16 * 60 + 25, // 16:25
+      9: 18 * 60 + 20, // 18:20
+      10: 19 * 60 + 6,  // 19:06（吉大实际作息时间）
+      11: 20 * 60 + 0,  // 20:00
+      12: 20 * 60 + 46, // 20:46
     };
     
     // 找到下一节课
@@ -147,17 +147,17 @@ class WidgetService {
   static DateTime? _getCourseDateTime(Course course, DateTime date) {
     final classSchedule = {
       1: const TimeOfDay(hour: 8, minute: 0),
-      2: const TimeOfDay(hour: 8, minute: 50),
+      2: const TimeOfDay(hour: 8, minute: 55),
       3: const TimeOfDay(hour: 10, minute: 0),
-      4: const TimeOfDay(hour: 10, minute: 50),
-      5: const TimeOfDay(hour: 14, minute: 0),
-      6: const TimeOfDay(hour: 14, minute: 50),
-      7: const TimeOfDay(hour: 16, minute: 0),
-      8: const TimeOfDay(hour: 16, minute: 50),
-      9: const TimeOfDay(hour: 19, minute: 0),
-      10: const TimeOfDay(hour: 19, minute: 50),
-      11: const TimeOfDay(hour: 20, minute: 40),
-      12: const TimeOfDay(hour: 21, minute: 30),
+      4: const TimeOfDay(hour: 10, minute: 55),
+      5: const TimeOfDay(hour: 13, minute: 30),
+      6: const TimeOfDay(hour: 14, minute: 25),
+      7: const TimeOfDay(hour: 15, minute: 30),
+      8: const TimeOfDay(hour: 16, minute: 25),
+      9: const TimeOfDay(hour: 18, minute: 20),
+      10: const TimeOfDay(hour: 19, minute: 6),  // 19:06（吉大实际作息时间）
+      11: const TimeOfDay(hour: 20, minute: 0),
+      12: const TimeOfDay(hour: 20, minute: 46),
     };
     
     final time = classSchedule[course.startSection];
